@@ -1109,10 +1109,10 @@ export const useCanvas = (): UseCanvasReturn => {
     nativeWidthRef.current = templateWidth;
     nativeHeightRef.current = templateHeight;
 
-    // Calculate and apply zoom immediately to avoid "native size" flash
+    // Calculate and apply a safe initial zoom
     const workspace = document.getElementById('canvas-workspace');
-    let initialZoom = 100;
-    if (workspace) {
+    let initialZoom = 60; // Default to a safe 60% if workspace not ready
+    if (workspace && workspace.clientWidth > 0) {
       const padding = 64;
       const scaleX = (workspace.clientWidth - padding) / templateWidth;
       const scaleY = (workspace.clientHeight - padding) / templateHeight;
@@ -1130,8 +1130,13 @@ export const useCanvas = (): UseCanvasReturn => {
       interactive: true,
     });
 
+    // Final fit-to-screen after a short delay to ensure DOM layout is stable
+    setTimeout(() => {
+      zoomToFit();
+    }, 100);
+
     saveToHistory(canvas);
-  }, [canvas, saveToHistory, zoomToFit]);
+  }, [canvas, saveToHistory, zoomToFit, setZoom]);
 
   const loadFromJSON = useCallback(async (json: any) => {
     if (!canvas) return;
@@ -1169,10 +1174,10 @@ export const useCanvas = (): UseCanvasReturn => {
       nativeWidthRef.current = templateWidth;
       nativeHeightRef.current = templateHeight;
 
-      // Calculate and apply zoom immediately to avoid "native size" flash
+      // Calculate and apply a safe initial zoom
       const workspace = document.getElementById('canvas-workspace');
-      let initialZoom = 100;
-      if (workspace) {
+      let initialZoom = 60; // Default to 60% if workspace not ready
+      if (workspace && workspace.clientWidth > 0) {
         const padding = 64;
         const scaleX = (workspace.clientWidth - padding) / templateWidth;
         const scaleY = (workspace.clientHeight - padding) / templateHeight;
@@ -1268,6 +1273,11 @@ export const useCanvas = (): UseCanvasReturn => {
       toast.success("Design loaded");
 
       console.log('Canvas loaded from JSON successfully');
+
+      // Final fit-to-screen after a short delay
+      setTimeout(() => {
+        zoomToFit();
+      }, 100);
     } catch (error) {
       console.error('Error loading canvas from JSON', error);
       toast.dismiss(toastId);

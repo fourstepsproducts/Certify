@@ -19,7 +19,9 @@ export const sanitizeUrl = (url: string | null | undefined): string => {
             // Check if it contains /uploads/ or /showcase-filled/ (common asset paths in this app)
             const match = url.match(/(?:\/uploads\/|\/showcase-filled\/).*/);
             if (match) {
-                return match[0];
+                // Return absolute URL using the API base from environment
+                const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+                return `${apiBase}${match[0]}`;
             }
         }
     } catch (e) {
