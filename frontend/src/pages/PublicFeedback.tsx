@@ -28,7 +28,7 @@ const PublicFeedback = () => {
 
     const fetchLinkDetails = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/feedback/link/${linkId}`);
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/feedback/link/${linkId}`);
 
             if (!response.ok) {
                 throw new Error('Invalid or inactive feedback link');
@@ -63,7 +63,7 @@ const PublicFeedback = () => {
         setSubmitting(true);
 
         try {
-            const response = await fetch(`http://localhost:5000/api/feedback/submit/${linkId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/feedback/submit/${linkId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

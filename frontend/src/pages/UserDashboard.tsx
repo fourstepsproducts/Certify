@@ -39,7 +39,7 @@ const UserDashboard = () => {
 
     const fetchBills = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/payments/history', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payments/history`, {
                 headers: {
                     'Authorization': `Bearer ${user?.token}`
                 }

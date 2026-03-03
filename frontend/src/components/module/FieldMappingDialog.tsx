@@ -72,7 +72,7 @@ export const FieldMappingDialog = ({
         setLoading(true);
         try {
             const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
-            const res = await fetch(`http://localhost:5000/api/templates/${templateId}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates/${templateId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -139,7 +139,7 @@ export const FieldMappingDialog = ({
             const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
 
             // We need to update the MODULE with this mapping
-            const res = await fetch(`http://localhost:5000/api/modules/${moduleId}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/modules/${moduleId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

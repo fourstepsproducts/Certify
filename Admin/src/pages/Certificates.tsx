@@ -139,7 +139,7 @@ const CertificatesPage = ({ onLogout }: CertificatesProps) => {
     const fetchTemplates = async () => {
         try {
             const token = localStorage.getItem('adminToken');
-            const response = await fetch('/api/admin/templates', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/templates`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -264,7 +264,7 @@ const CertificatesPage = ({ onLogout }: CertificatesProps) => {
 
                     if (!img && baseImageUrl.startsWith('/')) {
                         console.log("[FABRIC] Local path failed, trying backend fallback...");
-                        img = await tryLoad(`http://localhost:5000${baseImageUrl}`);
+                        img = await tryLoad(`${import.meta.env.VITE_API_BASE_URL}${baseImageUrl}`);
                     }
 
                     if (img) {
@@ -413,7 +413,7 @@ const CertificatesPage = ({ onLogout }: CertificatesProps) => {
             };
 
             const token = localStorage.getItem('adminToken');
-            const res = await fetch('/api/admin/templates', {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/templates`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ name: newTemplateName, thumbnail: thumbnailBase64, canvasData, status: 'draft' })
@@ -513,7 +513,7 @@ const CertificatesPage = ({ onLogout }: CertificatesProps) => {
             canvas.requestRenderAll();
 
             const token = localStorage.getItem('adminToken');
-            const res = await fetch(`/api/admin/templates/${editingTemplate._id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/templates/${editingTemplate._id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({
@@ -548,7 +548,7 @@ const CertificatesPage = ({ onLogout }: CertificatesProps) => {
         const toastId = toast.loading('Deleting certificate...');
         try {
             const token = localStorage.getItem('adminToken');
-            const response = await fetch(`/api/admin/templates/${selectedTemplateId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/templates/${selectedTemplateId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -580,7 +580,7 @@ const CertificatesPage = ({ onLogout }: CertificatesProps) => {
         try {
             const token = localStorage.getItem('adminToken');
             for (const t of DEFAULT_TEMPLATES) {
-                await fetch('/api/admin/templates', {
+                await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/templates`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ ...t, status: 'published' })

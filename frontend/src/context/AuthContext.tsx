@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     console.log('AuthContext: Found token in URL, validating...');
                     try {
                         console.log('AuthContext: Fetching /api/auth/me...');
-                        const response = await fetch('/api/auth/me', {
+                        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/me`, {
                             headers: { 'Authorization': `Bearer ${urlToken}` }
                         });
                         console.log('AuthContext: /api/auth/me response status:', response.status);
@@ -101,7 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                             setUser(parsed);
 
                             // Re-fetch from backend to get latest data (plan changes, etc)
-                            const response = await fetch('/api/auth/me', {
+                            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/me`, {
                                 headers: { 'Authorization': `Bearer ${parsed.token}` }
                             });
 

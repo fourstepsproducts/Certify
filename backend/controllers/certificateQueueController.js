@@ -290,7 +290,7 @@ const sendCertificates = asyncHandler(async (req, res) => {
                 }
             }
 
-            const certLink = `${process.env.BASE_URL || 'http://localhost:5173'}/editor?${urlParams}`;
+            const certLink = `${process.env.FRONTEND_URL}/editor?${urlParams}`;
 
             // Create email content
             const mailOptions = {

@@ -335,7 +335,7 @@ const verifyRazorpayPayment = asyncHandler(async (req, res) => {
 
         // Send confirmation email
         try {
-            const dashboardUrl = "http://localhost:5173/user/dashboard";
+            const dashboardUrl = `${process.env.FRONTEND_URL}/user/dashboard`;
             await transporter.sendMail({
                 from: `"CertifyPro" <${process.env.EMAIL_USER}>`,
                 to: email,

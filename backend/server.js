@@ -46,7 +46,7 @@ app.use((req, res, next) => {
 });
 
 app.use(cors({
-    origin: '*', // Allow all origins for now
+    origin: process.env.FRONTEND_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'sentry-trace', 'baggage']
 }));

@@ -190,7 +190,7 @@ const ModuleDetail = () => {
 
                 try {
                     const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
-                    const response = await fetch('http://localhost:5000/api/templates', {
+                    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -265,7 +265,7 @@ const ModuleDetail = () => {
     const fetchOrganizerSettings = useCallback(async () => {
         try {
             const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
-            const res = await fetch('http://localhost:5000/api/payments/organizer-settings', {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payments/organizer-settings`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -316,7 +316,7 @@ const ModuleDetail = () => {
             const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
 
             // Fetch module details
-            const moduleRes = await fetch(`http://localhost:5000/api/modules/${id}`, {
+            const moduleRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/modules/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!moduleRes.ok) throw new Error('Failed to fetch module');
@@ -341,7 +341,7 @@ const ModuleDetail = () => {
             }
 
             // Fetch registrations
-            const regRes = await fetch(`http://localhost:5000/api/registrations/module/${id}`, {
+            const regRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/registrations/module/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (regRes.ok) {
@@ -350,7 +350,7 @@ const ModuleDetail = () => {
             }
 
             // Fetch feedback
-            const feedbackRes = await fetch(`http://localhost:5000/api/feedback/module/${id}`, {
+            const feedbackRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/feedback/module/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (feedbackRes.ok) {
@@ -359,7 +359,7 @@ const ModuleDetail = () => {
             }
 
             // Fetch certificate queue
-            const queueRes = await fetch(`http://localhost:5000/api/certificates/queue/${id}`, {
+            const queueRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/certificates/queue/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (queueRes.ok) {
@@ -368,7 +368,7 @@ const ModuleDetail = () => {
             }
 
             // Fetch templates
-            const templatesRes = await fetch('http://localhost:5000/api/templates', {
+            const templatesRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (templatesRes.ok) {
@@ -377,7 +377,7 @@ const ModuleDetail = () => {
             }
 
             // Fetch registration link config
-            const linkRes = await fetch(`http://localhost:5000/api/registrations/link/module/${id}`, {
+            const linkRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/registrations/link/module/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (linkRes.ok) {
@@ -472,7 +472,7 @@ const ModuleDetail = () => {
         setIsUpdatingSettings(true);
         try {
             const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
-            const res = await fetch(`http://localhost:5000/api/payments/settings/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payments/settings/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -525,7 +525,7 @@ const ModuleDetail = () => {
         setIsTestingConnection(true);
         try {
             const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
-            const res = await fetch(`http://localhost:5000/api/payments/test-connection/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payments/test-connection/${id}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -556,7 +556,7 @@ const ModuleDetail = () => {
         setIsUpdatingSettings(true);
         try {
             const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
-            const res = await fetch(`http://localhost:5000/api/modules/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/modules/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -646,7 +646,7 @@ const ModuleDetail = () => {
             // Save certificate config (including prefix) first
             await updateCertificateConfig({ certNumberPrefix });
 
-            const response = await fetch('http://localhost:5000/api/registrations/link', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/registrations/link`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -677,7 +677,7 @@ const ModuleDetail = () => {
 
     const createFeedbackLink = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/feedback/link', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/feedback/link`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -709,7 +709,7 @@ const ModuleDetail = () => {
     const matchEmails = async () => {
         setMatching(true);
         try {
-            const response = await fetch(`http://localhost:5000/api/certificates/match/${id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/certificates/match/${id}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${user?.token || JSON.parse(localStorage.getItem('user') || '{}').token}`
@@ -726,7 +726,7 @@ const ModuleDetail = () => {
             });
 
             // Refresh queue
-            const queueRes = await fetch(`http://localhost:5000/api/certificates/queue/${id}`, {
+            const queueRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/certificates/queue/${id}`, {
                 headers: { 'Authorization': `Bearer ${user?.token || JSON.parse(localStorage.getItem('user') || '{}').token}` }
             });
             if (queueRes.ok) {
@@ -751,7 +751,7 @@ const ModuleDetail = () => {
             // Merge nested config carefully
             const currentConfig = module?.certificateConfig || {};
 
-            const res = await fetch(`http://localhost:5000/api/modules/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/modules/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -810,7 +810,7 @@ const ModuleDetail = () => {
 
         setSending(true);
         try {
-            const response = await fetch('http://localhost:5000/api/certificates/send', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/certificates/send`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -856,7 +856,7 @@ const ModuleDetail = () => {
             const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
 
             // Fetch eligible students data
-            const response = await fetch(`http://localhost:5000/api/certificates/eligible/${id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/certificates/eligible/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -1633,7 +1633,7 @@ const ModuleDetail = () => {
 
                                 if (!templateId) {
                                     // 1. Create NEW Template
-                                    const createRes = await fetch(`http://localhost:5000/api/templates`, {
+                                    const createRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates`, {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json',
@@ -1655,7 +1655,7 @@ const ModuleDetail = () => {
                                     await updateCertificateConfig({ templateId });
                                 } else {
                                     // 2. Update EXISTING Template
-                                    const updateRes = await fetch(`http://localhost:5000/api/templates/${templateId}`, {
+                                    const updateRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates/${templateId}`, {
                                         method: 'PUT',
                                         headers: {
                                             'Content-Type': 'application/json',

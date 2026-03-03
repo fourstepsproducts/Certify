@@ -39,7 +39,7 @@ const UsersPage = ({ onLogout }: UsersProps) => {
 
         setResetting(true);
         try {
-            const response = await fetch('http://localhost:5000/api/admin/reset-user-plan', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/reset-user-plan`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ const UsersPage = ({ onLogout }: UsersProps) => {
     const handleToggleLayoutLock = async (userId: string, currentStatus: boolean) => {
         const newStatus = !currentStatus;
         try {
-            const response = await fetch('http://localhost:5000/api/admin/toggle-layout-lock-permission', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/toggle-layout-lock-permission`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ const UsersPage = ({ onLogout }: UsersProps) => {
             }
 
             try {
-                const response = await fetch('http://localhost:5000/api/admin/users', {
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/users`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

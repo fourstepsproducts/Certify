@@ -192,7 +192,7 @@ const Editor = () => {
       const loadUserTemplate = async () => {
         toast.info("Loading design...");
         try {
-          const res = await fetch(`/api/templates/${userTemplateId}`, {
+          const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates/${userTemplateId}`, {
             headers: { 'Authorization': `Bearer ${user.token}` }
           });
 
@@ -287,7 +287,7 @@ const Editor = () => {
 
           if (user?.token) {
             try {
-              const res = await fetch('/api/templates/layout-overrides', {
+              const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates/layout-overrides`, {
                 headers: { 'Authorization': `Bearer ${user.token}` }
               });
               if (res.ok) {
@@ -315,7 +315,7 @@ const Editor = () => {
             // Try fetching as private template first if logged in
             if (user?.token) {
               try {
-                const privateRes = await fetch(`/api/templates/${templateId}`, {
+                const privateRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates/${templateId}`, {
                   headers: { 'Authorization': `Bearer ${user.token}` }
                 });
                 if (privateRes.ok) res = privateRes;
@@ -325,7 +325,7 @@ const Editor = () => {
             // If not found or not logged in, try public endpoint
             if (!res || !res.ok) {
               try {
-                const publicRes = await fetch(`/api/templates/public/${templateId}`);
+                const publicRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates/public/${templateId}`);
                 if (publicRes.ok) res = publicRes;
               } catch (e) { /* ignore */ }
             }
@@ -543,7 +543,7 @@ const Editor = () => {
         try {
           const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
 
-          const response = await fetch(`http://localhost:5000/api/certificates/eligible/${moduleId}`, {
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/certificates/eligible/${moduleId}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -656,7 +656,7 @@ const Editor = () => {
     if (!user?.token) return true; // Allow guest/dev mode if needed, or force auth
 
     try {
-      const res = await fetch('/api/templates/download', {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates/download`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

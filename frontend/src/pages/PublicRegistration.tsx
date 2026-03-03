@@ -70,7 +70,7 @@ const PublicRegistration = () => {
 
     const fetchLinkDetails = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/registrations/link/${linkId}`);
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/registrations/link/${linkId}`);
 
             if (!response.ok) {
                 throw new Error('Invalid or inactive registration link');
@@ -136,7 +136,7 @@ const PublicRegistration = () => {
                 return;
             }
 
-            const response = await fetch(`http://localhost:5000/api/registrations/submit/${linkId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/registrations/submit/${linkId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -221,7 +221,7 @@ const PublicRegistration = () => {
         setIsInitiatingPayment(true);
         try {
             // 1. Create Order on Backend
-            const orderRes = await fetch('http://localhost:5000/api/payments/create-order', {
+            const orderRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payments/create-order`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -273,7 +273,7 @@ const PublicRegistration = () => {
     const verifyRazorpayPayment = async (paymentResponse: any, name: string, email: string) => {
         setIsVerifying(true);
         try {
-            const res = await fetch('http://localhost:5000/api/payments/verify-razorpay', {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payments/verify-razorpay`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -29,7 +29,7 @@ const SignIn = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -149,7 +149,7 @@ const SignIn = () => {
                 className="w-full"
                 size="lg"
                 disabled={isLoading}
-                onClick={() => window.location.href = 'http://localhost:5000/api/auth/google'}
+                onClick={() => window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/auth/google`}
                 type="button"
               >
                 <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">

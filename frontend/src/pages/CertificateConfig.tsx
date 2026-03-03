@@ -91,7 +91,7 @@ const CertificateConfig = () => {
             const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
 
             // Fetch module
-            const moduleRes = await fetch(`http://localhost:5000/api/modules/${id}`, {
+            const moduleRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/modules/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!moduleRes.ok) throw new Error('Failed to fetch module');
@@ -104,7 +104,7 @@ const CertificateConfig = () => {
             }
 
             // Fetch registration fields for mapping
-            const linkRes = await fetch(`http://localhost:5000/api/registrations/link/module/${id}`, {
+            const linkRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/registrations/link/module/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (linkRes.ok) {
@@ -113,7 +113,7 @@ const CertificateConfig = () => {
             }
 
             // Fetch available templates
-            const templatesRes = await fetch('http://localhost:5000/api/templates', {
+            const templatesRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (templatesRes.ok) {
@@ -197,7 +197,7 @@ const CertificateConfig = () => {
         if (!template) {
             try {
                 const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
-                const res = await fetch(`http://localhost:5000/api/templates/${selectedTemplateId}`, {
+                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates/${selectedTemplateId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {
@@ -234,7 +234,7 @@ const CertificateConfig = () => {
 
                 try {
                     const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
-                    const response = await fetch('http://localhost:5000/api/templates', {
+                    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -291,7 +291,7 @@ const CertificateConfig = () => {
                 const selectedTemplate = templates.find(t => t._id === selectedTemplateId);
                 if (selectedTemplate) {
                     // Create a copy in DB
-                    const createRes = await fetch('http://localhost:5000/api/templates', {
+                    const createRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -315,7 +315,7 @@ const CertificateConfig = () => {
                 }
             }
 
-            const res = await fetch(`http://localhost:5000/api/modules/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/modules/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -610,7 +610,7 @@ const CertificateConfig = () => {
                 onSave={async (data, thumb) => {
                     // Update current selected template with new data
                     const token = user?.token || JSON.parse(localStorage.getItem('user') || '{}').token;
-                    await fetch(`http://localhost:5000/api/templates/${selectedTemplateId}`, {
+                    await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates/${selectedTemplateId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',

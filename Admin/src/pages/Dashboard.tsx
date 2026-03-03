@@ -35,7 +35,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             }
 
             try {
-                const response = await fetch('http://localhost:5000/api/admin/stats', {
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/stats`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

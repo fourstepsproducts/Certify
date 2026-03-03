@@ -30,7 +30,7 @@ export default function QuickGenerator() {
     useEffect(() => {
         const fetchPublicTemplates = async () => {
             try {
-                const res = await fetch('/api/templates/public');
+                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/templates/public`);
                 if (res.ok) {
                     const data = await res.json();
                     const mapped = data.map((t: any) => ({
