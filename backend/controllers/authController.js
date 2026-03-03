@@ -189,7 +189,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
                 <p>Redirecting you to login...</p>
                 <script>
                     setTimeout(() => {
-                        window.location.href = '${process.env.FRONTEND_URL}/signin';
+                        window.location.href = '${process.env.FRONTEND_URL || 'http://localhost:5173'}/signin';
                     }, 2000);
                 </script>
             </div>
@@ -240,7 +240,8 @@ const googleCallback = asyncHandler(async (req, res) => {
     console.log('googleCallback reached for user:', req.user._id);
     const token = generateToken(req.user._id);
     console.log('Generated token, redirecting back to frontend...');
-    res.redirect(`${process.env.FRONTEND_URL}/editor?token=${token}`);
+    const targetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/editor?token=${token}`;
+    res.redirect(targetUrl);
 });
 
 // @desc    Complete user profile (onboarding)
