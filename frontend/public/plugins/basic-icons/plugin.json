@@ -1,0 +1,69 @@
+{
+    "id": "basic-icons",
+    "name": "Basic Certificate Icons",
+    "type": "icons",
+    "version": "1.0.0",
+    "author": "Aigenxt",
+    "items": [
+        {
+            "id": "sun",
+            "name": "Sun",
+            "url": "/plugins/basic-icons/icons/sun.svg",
+            "category": "Colored"
+        },
+        {
+            "id": "cloud",
+            "name": "Cloud",
+            "url": "/plugins/basic-icons/icons/cloud.svg",
+            "category": "Colored"
+        },
+        {
+            "id": "heart",
+            "name": "Heart",
+            "url": "/plugins/basic-icons/icons/heart.svg",
+            "category": "Colored"
+        },
+        {
+            "id": "tree",
+            "name": "Tree",
+            "url": "/plugins/basic-icons/icons/tree.svg",
+            "category": "Colored"
+        },
+        {
+            "id": "flower",
+            "name": "Flower",
+            "url": "/plugins/basic-icons/icons/flower.svg",
+            "category": "Colored"
+        },
+        {
+            "id": "user",
+            "name": "User",
+            "url": "/plugins/basic-icons/icons/user.svg",
+            "category": "Line"
+        },
+        {
+            "id": "settings",
+            "name": "Settings",
+            "url": "/plugins/basic-icons/icons/settings.svg",
+            "category": "Line"
+        },
+        {
+            "id": "home",
+            "name": "Home",
+            "url": "/plugins/basic-icons/icons/home.svg",
+            "category": "Line"
+        },
+        {
+            "id": "search",
+            "name": "Search",
+            "url": "/plugins/basic-icons/icons/search.svg",
+            "category": "Line"
+        },
+        {
+            "id": "mail",
+            "name": "Mail",
+            "url": "/plugins/basic-icons/icons/mail.svg",
+            "category": "Line"
+        }
+    ]
+}
