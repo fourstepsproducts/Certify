@@ -15,6 +15,10 @@ const adminSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please add a password'],
     },
+    isSuperAdmin: {
+        type: Boolean,
+        default: false,
+    },
 }, {
     timestamps: true,
 });
