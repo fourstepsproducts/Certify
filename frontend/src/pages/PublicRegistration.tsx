@@ -138,7 +138,13 @@ const PublicRegistration = () => {
                 return;
             }
 
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/registrations/submit/${linkId}`, {
+            const apiBase = import.meta.env.VITE_API_BASE_URL;
+            const isProd = !window.location.origin.includes('localhost');
+            const safeBase = (isProd && apiBase?.includes('localhost')) ? '' : (apiBase || '');
+            const apiUrl = `${safeBase}/api/registrations/submit/${linkId}`;
+
+            console.log("📝 Calling Registration API at:", apiUrl);
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -229,8 +235,14 @@ const PublicRegistration = () => {
 
         setIsInitiatingPayment(true);
         try {
+            const apiBase = import.meta.env.VITE_API_BASE_URL;
+            const isProd = !window.location.origin.includes('localhost');
+            const safeBase = (isProd && apiBase?.includes('localhost')) ? '' : (apiBase || '');
+            const apiUrl = `${safeBase}/api/payments/create-order`;
+
+            console.log("💳 Calling Create Order API at:", apiUrl);
             // 1. Create Order on Backend
-            const orderRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payments/create-order`, {
+            const orderRes = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -277,6 +289,7 @@ const PublicRegistration = () => {
                         });
                     }
                 },
+                callback_url: `${import.meta.env.VITE_API_BASE_URL && !import.meta.env.VITE_API_BASE_URL.includes('localhost') ? import.meta.env.VITE_API_BASE_URL : window.location.origin}/api/payments/verify?moduleId=${link?.moduleId._id}&linkId=${linkId}&email=${email}&name=${encodeURIComponent(name)}&phone=${phone}`,
                 prefill: {
                     name,
                     email,
@@ -332,7 +345,12 @@ const PublicRegistration = () => {
         console.log("🔍 Starting payment verification...");
         console.log("📦 Payment response:", paymentResponse);
         try {
-            const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/payments/verify`;
+            const apiBase = import.meta.env.VITE_API_BASE_URL;
+            const isProd = !window.location.origin.includes('localhost');
+            const safeBase = (isProd && apiBase?.includes('localhost')) ? '' : (apiBase || '');
+            const apiUrl = `${safeBase}/api/payments/verify`;
+
+            console.log("📡 Calling Verify API at:", apiUrl);
             const res = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
