@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { LayoutDashboard, Users, FileText, Settings, LogOut } from 'lucide-react';
+import { ReactNode, useState } from 'react';
+import { LayoutDashboard, Users, FileText, Settings, LogOut, Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface LayoutProps {
@@ -10,25 +10,57 @@ interface LayoutProps {
 
 const Layout = ({ children, onLogout, title = 'Overview' }: LayoutProps) => {
     const location = useLocation();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const adminName = JSON.parse(localStorage.getItem('adminData') || '{}').name || 'Admin';
+
+    const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-white flex">
+            {/* Mobile Overlay */}
+            {isMobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <div className="hidden lg:flex w-64 border-r border-white/5 bg-[#0d0d0d] flex-col fixed h-full z-30">
-                <div className="p-6">
-                    <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">CertifyPro Admin</h1>
+            <div className={`
+                fixed inset-y-0 left-0 w-64 border-r border-white/5 bg-[#0d0d0d] flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 lg:static lg:h-screen
+                ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            `}>
+                <div className="p-6 flex items-center justify-between">
+                    <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent italic">CertifyPro Admin</h1>
+                    <button
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="lg:hidden p-2 text-gray-400 hover:text-white"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
                 </div>
                 <nav className="flex-1 px-4 space-y-2">
-                    <Link to="/dashboard" className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${location.pathname === '/dashboard' ? 'bg-blue-600/10 text-blue-400' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
+                    <Link
+                        to="/dashboard"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${location.pathname === '/dashboard' ? 'bg-blue-600/10 text-blue-400' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+                    >
                         <LayoutDashboard className="w-5 h-5" />
                         Dashboard
                     </Link>
-                    <Link to="/users" className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${location.pathname === '/users' ? 'bg-blue-600/10 text-blue-400' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
+                    <Link
+                        to="/users"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${location.pathname === '/users' ? 'bg-blue-600/10 text-blue-400' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+                    >
                         <Users className="w-5 h-5" />
                         Users Collection
                     </Link>
-                    <Link to="/certificates" className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${location.pathname === '/certificates' ? 'bg-blue-600/10 text-blue-400' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
+                    <Link
+                        to="/certificates"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${location.pathname === '/certificates' ? 'bg-blue-600/10 text-blue-400' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+                    >
                         <FileText className="w-5 h-5" />
                         Certificates Collection
                     </Link>
@@ -49,14 +81,22 @@ const Layout = ({ children, onLogout, title = 'Overview' }: LayoutProps) => {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col ml-0 lg:ml-64 min-w-0 relative max-w-full">
-                <header className="h-16 border-b border-white/5 bg-[#0d0d0d] px-8 flex items-center justify-between sticky top-0 z-10 min-w-0">
-                    <h2 className="text-lg font-semibold">{title}</h2>
+            <div className="flex-1 flex flex-col min-w-0 relative max-w-full">
+                <header className="h-16 border-b border-white/5 bg-[#0d0d0d] px-4 sm:px-8 flex items-center justify-between sticky top-0 z-10 min-w-0">
                     <div className="flex items-center gap-4">
-                        <div className="text-sm text-gray-400">
+                        <button
+                            onClick={toggleMobileMenu}
+                            className="lg:hidden p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                        >
+                            <Menu className="w-6 h-6" />
+                        </button>
+                        <h2 className="text-lg font-semibold truncate">{title}</h2>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="hidden sm:block text-sm text-gray-400">
                             Welcome back, <span className="text-white font-medium">{adminName}</span>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-bold">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-bold shrink-0">
                             {adminName.charAt(0)}
                         </div>
                     </div>
