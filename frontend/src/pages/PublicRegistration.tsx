@@ -253,9 +253,11 @@ const PublicRegistration = () => {
 
                     if (verified) {
                         // First submit the registration to the database
-                        await handleSubmit(undefined, true);
-                        // Then redirect to the success page regardless of internal validation returns
-                        navigate(`/success?moduleName=${encodeURIComponent(moduleName)}`);
+                        const registered = await handleSubmit(undefined, true);
+                        if (registered) {
+                            // Use window.location.href for absolute reliability in production callbacks
+                            window.location.href = `/success?moduleName=${encodeURIComponent(moduleName)}`;
+                        }
                     } else {
                         toast({
                             title: 'Verification Failed',
