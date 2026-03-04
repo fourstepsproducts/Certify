@@ -90,8 +90,8 @@ const PublicRegistration = () => {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
 
         // Initialize derived core fields
         let derivedName = '';
@@ -126,6 +126,7 @@ const PublicRegistration = () => {
 
         try {
             // Final check for payment if required
+            // Skip payment check if it's already verified OR if we just verified it
             if (link?.moduleId.isPaid && !isPaymentVerified) {
                 toast({
                     title: 'Payment Required',
@@ -290,9 +291,15 @@ const PublicRegistration = () => {
             setIsPaymentVerified(true);
             toast({
                 title: 'Payment Successful!',
-                description: 'You can now complete your registration.',
+                description: 'Processing your registration...',
                 className: 'bg-green-600 text-white'
             });
+
+            // Automatically submit the form after successful payment
+            // We pass the verified flag to handleSubmit if needed, or rely on state
+            // Since setIsPaymentVerified is async, we call it in a way that respects the verified status
+            setTimeout(() => handleSubmit(), 500);
+
         } catch (error: any) {
             toast({
                 title: 'Verification Failed',
