@@ -1,4 +1,5 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, "../.env") });
 const mongoose = require("mongoose");
 
 const User = require("../models/User");
@@ -6,6 +7,9 @@ const Admin = require("../models/Admin");
 
 async function seedAdmin() {
     try {
+        if (!process.env.MONGO_URI) {
+            throw new Error("MONGO_URI is not defined in .env file");
+        }
         await mongoose.connect(process.env.MONGO_URI);
 
         // 1. Cleanup previous mistakes
