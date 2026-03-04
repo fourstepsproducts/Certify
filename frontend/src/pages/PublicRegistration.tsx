@@ -202,6 +202,11 @@ const PublicRegistration = () => {
             }
         }
 
+        console.log("💳 Initiating payment...");
+        console.log("📧 Email:", email);
+        console.log("👤 Name:", name);
+        console.log("📱 Phone:", phone);
+
         if (!email) {
             toast({
                 title: 'Email Required',
@@ -248,24 +253,29 @@ const PublicRegistration = () => {
                 description: `Payment for ${link?.moduleId.name}`,
                 order_id: orderData.orderId,
                 handler: async function (response: any) {
-                    console.log("Razorpay success handler triggered", response);
-                    const verified = await verifyRazorpayPayment(response, name, email);
+                    console.log("✅ Razorpay success handler triggered", response);
+                    try {
+                        const verified = await verifyRazorpayPayment(response, name, email);
+                        console.log("🔍 Verification result:", verified);
 
-                    if (verified) {
-                        // First submit the registration to the database
-                        const registered = await handleSubmit(undefined, true);
-                        if (registered) {
-                            // Use window.location.href for absolute reliability in production callbacks
+                        if (verified) {
+                            const registered = await handleSubmit(undefined, true);
+                            console.log("📝 Registration result:", registered);
+
+                            console.log("➡️ Redirecting to success page");
                             window.location.href = `/success?moduleName=${encodeURIComponent(moduleName)}`;
+                        } else {
+                            toast({
+                                title: 'Verification Failed',
+                                description: 'Payment verification failed. Please contact support.',
+                                variant: 'destructive'
+                            });
                         }
-                    } else {
-                        toast({
-                            title: 'Verification Failed',
-                            description: 'Payment verification failed. Please contact support.',
-                            variant: 'destructive'
-                        });
+                    } catch (error) {
+                        console.error("❌ Error inside Razorpay handler:", error);
                     }
                 },
+                callback_url: `${import.meta.env.VITE_API_BASE_URL}/api/payments/verify`,
                 prefill: {
                     name,
                     email,
@@ -274,34 +284,28 @@ const PublicRegistration = () => {
                 theme: {
                     color: "#4F46E5"
                 },
-                config: {
-                    display: {
-                        preferences: {
-                            show_default_blocks: true
-                        }
-                    }
-                },
                 modal: {
                     ondismiss: function () {
-                        console.log("Payment popup closed");
+                        console.log("⚠️ Payment popup closed by user");
                     }
                 }
             };
 
             if (!(window as any).Razorpay) {
+                console.error("❌ Razorpay SDK not loaded");
                 toast({
                     title: "Payment Error",
-                    description: "Razorpay failed to load. Please refresh.",
+                    description: "Razorpay failed to load. Please refresh and try again.",
                     variant: "destructive"
                 });
                 return;
             }
 
+            console.log("🚀 Starting Razorpay payment...");
             const rzp = new (window as any).Razorpay(options);
 
-            // Add a failure handler to catch common production issues
             rzp.on('payment.failed', function (response: any) {
-                console.error("Payment failed", response.error);
+                console.error("❌ Payment failed:", response.error);
                 toast({
                     title: 'Payment Failed',
                     description: response.error.description || 'Reason unknown',
@@ -324,7 +328,8 @@ const PublicRegistration = () => {
 
     const verifyRazorpayPayment = async (paymentResponse: any, name: string, email: string) => {
         setIsVerifying(true);
-        console.log("Starting verification for:", email);
+        console.log("🔍 Starting payment verification...");
+        console.log("📦 Payment response:", paymentResponse);
         try {
             const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/payments/verify`;
             const res = await fetch(apiUrl, {
@@ -341,14 +346,22 @@ const PublicRegistration = () => {
                 })
             });
 
+            console.log("📡 Verify API status:", res.status);
             const data = await res.json();
+            console.log("📡 Verify API response:", data);
+
             if (!res.ok) throw new Error(data.message || 'Verification failed');
 
             setIsPaymentVerified(true);
             return true;
 
         } catch (error: any) {
-            console.error("Payment verification error:", error);
+            console.error("❌ Payment verification error:", error);
+            toast({
+                title: 'Verification Failed',
+                description: error.message,
+                variant: 'destructive'
+            });
             return false;
         } finally {
             setIsVerifying(false);
