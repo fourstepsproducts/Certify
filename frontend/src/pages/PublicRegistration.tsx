@@ -110,7 +110,7 @@ const PublicRegistration = () => {
                 else if (!derivedPhone && (labelLower.includes('phone') || labelLower.includes('mobile'))) derivedPhone = value;
                 else if (!derivedName && (labelLower.includes('name'))) derivedName = value;
 
-                if (field.required) {
+                if (field.required && !skipPaymentCheck) {
                     if (!value || (typeof value === 'string' && value.trim() === '')) {
                         toast({
                             title: 'Required Field',
@@ -264,7 +264,7 @@ const PublicRegistration = () => {
                         const registered = await handleSubmit(undefined, true);
                         console.log("📝 Registration result:", registered);
 
-                        if (registered) {
+                        if (registered !== false) {
                             console.log("➡️ Redirecting to success page");
                             window.location.href = `/success?moduleName=${encodeURIComponent(moduleName)}`;
                         }
