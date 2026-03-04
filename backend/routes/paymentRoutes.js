@@ -11,8 +11,10 @@ const {
     getOrganizerSettings,
     saveOrganizerSettings
 } = require('../controllers/paymentController');
+const { handleRazorpayWebhook } = require('../controllers/webhookController');
 const { protect } = require('../middleware/authMiddleware');
 
+router.post('/webhook', handleRazorpayWebhook);
 router.post('/initiate', initiatePayment);
 router.post('/verify', verifyRazorpayPayment);
 router.get('/history', protect, getPaymentHistory);

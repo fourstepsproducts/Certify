@@ -16,12 +16,28 @@ export const sanitizeUrl = (url: string | null | undefined): string => {
     try {
         // Check if it's a localhost URL
         if (url.includes('localhost:') || url.includes('127.0.0.1:')) {
-            // Check if it contains /uploads/ or /showcase-filled/ (common asset paths in this app)
-            const match = url.match(/(?:\/uploads\/|\/showcase-filled\/).*/);
-            if (match) {
-                // Return absolute URL using the API base from environment
-                const apiBase = import.meta.env.VITE_API_BASE_URL || '';
-                return `${apiBase}${match[0]}`;
+            // Use type assertion to avoid lint errors with import.meta.env
+            const metaEnv = (import.meta as any).env;
+            const apiBase = metaEnv?.VITE_API_BASE_URL || '';
+
+            // Extract the path and query from the URL
+            try {
+                const urlObj = new URL(url);
+                const pathAndSearch = urlObj.pathname + urlObj.search;
+
+                // Return absolute URL using the API base from environment + the path
+                // This converts http://localhost:PORT/file.png to API_BASE/file.png
+                return `${apiBase}${pathAndSearch}`;
+            } catch (e) {
+                // Better fallback for malformed URLs
+                const parts = url.split('localhost:');
+                if (parts.length > 1) {
+                    const portAndPath = parts[1];
+                    const firstSlash = portAndPath.indexOf('/');
+                    if (firstSlash !== -1) {
+                        return `${apiBase}${portAndPath.substring(firstSlash)}`;
+                    }
+                }
             }
         }
     } catch (e) {

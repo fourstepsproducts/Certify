@@ -229,10 +229,22 @@ const testRazorpayConnection = asyncHandler(async (req, res) => {
 const createRazorpayOrder = asyncHandler(async (req, res) => {
     const { moduleId, amount, email, name } = req.body;
 
+    console.log(`[Order] Creating Razorpay order for Module: ${moduleId}, Email: ${email}`);
+
+    if (!moduleId || !mongoose.Types.ObjectId.isValid(moduleId)) {
+        res.status(400);
+        throw new Error('Valid Module ID is required');
+    }
+
     const moduleRecord = await Module.findById(moduleId).select('+paymentConfig.razorpaySecret');
     if (!moduleRecord || !moduleRecord.isPaid) {
         res.status(400);
-        throw new Error('Invalid module or module is not paid');
+        throw new Error('Invalid module or module is not configured for payments');
+    }
+
+    if (!moduleRecord.entryFee || moduleRecord.entryFee <= 0) {
+        res.status(400);
+        throw new Error('Module entry fee must be greater than zero');
     }
 
     let keyId = moduleRecord.paymentConfig.razorpayKeyId;
@@ -240,31 +252,44 @@ const createRazorpayOrder = asyncHandler(async (req, res) => {
 
     // Fallback to global settings if module levels are empty
     if (!keyId || !secretEncrypted) {
+        console.log('[Order] Module settings empty, falling back to global settings');
         const globalSettings = await OrganizerPaymentSettings.findOne({ organizerId: moduleRecord.userId }).select('+razorpaySecret');
         if (globalSettings) {
-            keyId = globalSettings.razorpayKeyId;
-            secretEncrypted = globalSettings.razorpaySecret;
+            keyId = keyId || globalSettings.razorpayKeyId;
+            secretEncrypted = secretEncrypted || globalSettings.razorpaySecret;
         }
     }
 
     if (!keyId || !secretEncrypted) {
         res.status(400);
-        throw new Error('Payment configuration missing for this module and no global settings found');
+        throw new Error('Razorpay credentials not found for this organizer');
+    }
+
+    const decryptedSecret = decrypt(secretEncrypted);
+    if (!decryptedSecret) {
+        res.status(500);
+        throw new Error('Failed to decrypt Razorpay secret. Please re-save credentials.');
     }
 
     const instance = new Razorpay({
         key_id: keyId,
-        key_secret: decrypt(secretEncrypted)
+        key_secret: decryptedSecret
     });
 
     const options = {
         amount: Math.round(moduleRecord.entryFee * 100), // convert to paisa
         currency: 'INR',
         receipt: `receipt_${Date.now()}`,
+        notes: {
+            moduleId: moduleId.toString(),
+            email: email || '',
+            name: name || ''
+        }
     };
 
     try {
         const order = await instance.orders.create(options);
+        console.log(`[Order] Successfully created Razorpay order: ${order.id}`);
         res.json({
             success: true,
             orderId: order.id,
@@ -272,8 +297,9 @@ const createRazorpayOrder = asyncHandler(async (req, res) => {
             keyId: keyId
         });
     } catch (error) {
+        console.error('[Order] Razorpay API Error:', error);
         res.status(500);
-        throw new Error('Error creating Razorpay order: ' + error.message);
+        throw new Error('Razorpay Service Error: ' + error.message);
     }
 });
 

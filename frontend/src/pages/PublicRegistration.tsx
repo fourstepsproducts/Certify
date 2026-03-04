@@ -255,6 +255,18 @@ const PublicRegistration = () => {
                 },
                 theme: {
                     color: "#4F46E5"
+                },
+                config: {
+                    display: {
+                        preferences: {
+                            show_default_blocks: true
+                        }
+                    }
+                },
+                modal: {
+                    ondismiss: function () {
+                        console.log("Payment popup closed");
+                    }
                 }
             };
 
