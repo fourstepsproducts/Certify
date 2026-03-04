@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
 const PaymentVerification = require('../models/PaymentVerification');
 const Module = require('../models/Module');

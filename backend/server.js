@@ -28,14 +28,17 @@ process.on('uncaughtException', (err) => {
 // Connect to database
 connectDB();
 
-// Passport Config
+const app = express();
+
+// Passport initialization (User requested this order)
+const passport = require('passport');
 require('./config/passport');
+app.use(passport.initialize());
+console.log("Registered passport strategies:", Object.keys(passport._strategies));
 
 // Seed Admin
 const { seedAdmin } = require('./controllers/adminAuthController');
 seedAdmin();
-
-const app = express();
 
 
 
@@ -69,8 +72,6 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-const passport = require('passport');
-app.use(passport.initialize());
 
 // Routes
 console.log('Registering /api/templates routes...');
