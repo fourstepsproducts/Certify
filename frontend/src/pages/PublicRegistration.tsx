@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,7 @@ interface LinkDetails {
 }
 
 const PublicRegistration = () => {
+    const navigate = useNavigate();
     const { linkId } = useParams();
     const [moduleName, setModuleName] = useState('');
     const [loading, setLoading] = useState(true);
@@ -172,12 +173,14 @@ const PublicRegistration = () => {
                 description: 'Registration submitted successfully.',
                 className: 'bg-green-600 text-white border-none'
             });
+            return true;
         } catch (error: any) {
             toast({
                 title: 'Registration Failed',
                 description: error.message || 'Failed to submit registration',
                 variant: 'destructive'
             });
+            return false;
         } finally {
             setSubmitting(false);
         }
@@ -246,7 +249,22 @@ const PublicRegistration = () => {
                 order_id: orderData.orderId,
                 handler: async function (response: any) {
                     console.log("Razorpay success handler triggered", response);
-                    await verifyRazorpayPayment(response, name, email);
+                    const verified = await verifyRazorpayPayment(response, name, email);
+
+                    if (verified) {
+                        // First submit the registration to the database
+                        const registered = await handleSubmit(undefined, true);
+                        if (registered) {
+                            // Then redirect to the success page
+                            navigate(`/success?moduleName=${encodeURIComponent(moduleName)}`);
+                        }
+                    } else {
+                        toast({
+                            title: 'Verification Failed',
+                            description: 'Payment verification failed. Please contact support.',
+                            variant: 'destructive'
+                        });
+                    }
                 },
                 prefill: {
                     name,
@@ -299,7 +317,7 @@ const PublicRegistration = () => {
         setIsVerifying(true);
         console.log("Starting verification for:", email);
         try {
-            const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/payments/verify`.replace('//api', '/api');
+            const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/payments/verify`;
             const res = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
@@ -318,24 +336,11 @@ const PublicRegistration = () => {
             if (!res.ok) throw new Error(data.message || 'Verification failed');
 
             setIsPaymentVerified(true);
-            toast({
-                title: 'Payment Successful!',
-                description: 'You will be redirected in 3 seconds',
-                className: 'bg-green-600 text-white'
-            });
-
-            // Automatically submit the form after 3 seconds as requested
-            setTimeout(() => {
-                handleSubmit(undefined, true);
-            }, 3000);
+            return true;
 
         } catch (error: any) {
             console.error("Payment verification error:", error);
-            toast({
-                title: 'Verification Failed',
-                description: 'Payment verification failed. Please contact support.',
-                variant: 'destructive'
-            });
+            return false;
         } finally {
             setIsVerifying(false);
         }

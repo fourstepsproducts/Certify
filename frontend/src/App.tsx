@@ -23,6 +23,7 @@ import QuickGenerator from "./pages/QuickGenerator";
 import Onboarding from "./pages/Onboarding";
 import UserDashboard from "./pages/UserDashboard";
 import DashboardRedirect from "./pages/DashboardRedirect";
+import Success from "./pages/Success";
 import { AuthProvider } from "./context/AuthContext";
 import { CookieConsent } from "./components/shared/CookieConsent";
 import * as Sentry from "@sentry/react";
@@ -59,6 +60,7 @@ const App = () => (
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/cookies" element={<Cookies />} />
               <Route path="/refund" element={<Refund />} />
+              <Route path="/success" element={<Success />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AuthProvider>
