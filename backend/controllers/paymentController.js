@@ -269,7 +269,7 @@ const createRazorpayOrder = asyncHandler(async (req, res) => {
             success: true,
             orderId: order.id,
             amount: options.amount,
-            keyId: moduleRecord.paymentConfig.razorpayKeyId
+            keyId: keyId
         });
     } catch (error) {
         res.status(500);
