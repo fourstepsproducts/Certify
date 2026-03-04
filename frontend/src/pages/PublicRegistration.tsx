@@ -259,6 +259,17 @@ const PublicRegistration = () => {
             };
 
             const rzp = new (window as any).Razorpay(options);
+
+            // Add a failure handler to catch common production issues
+            rzp.on('payment.failed', function (response: any) {
+                console.error("Payment failed", response.error);
+                toast({
+                    title: 'Payment Failed',
+                    description: response.error.description || 'Reason unknown',
+                    variant: 'destructive'
+                });
+            });
+
             rzp.open();
 
         } catch (error: any) {
@@ -274,10 +285,15 @@ const PublicRegistration = () => {
 
     const verifyRazorpayPayment = async (paymentResponse: any, name: string, email: string) => {
         setIsVerifying(true);
+        console.log("Starting verification for:", email);
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payments/verify`, {
+            const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/payments/verify`.replace('//api', '/api');
+            const res = await fetch(apiUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify({
                     ...paymentResponse,
                     moduleId: link?.moduleId._id,
