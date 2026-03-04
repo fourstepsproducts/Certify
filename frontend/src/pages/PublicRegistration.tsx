@@ -245,6 +245,7 @@ const PublicRegistration = () => {
                 description: `Payment for ${link?.moduleId.name}`,
                 order_id: orderData.orderId,
                 handler: async function (response: any) {
+                    console.log("Razorpay success handler triggered", response);
                     await verifyRazorpayPayment(response, name, email);
                 },
                 prefill: {
@@ -274,7 +275,7 @@ const PublicRegistration = () => {
     const verifyRazorpayPayment = async (paymentResponse: any, name: string, email: string) => {
         setIsVerifying(true);
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payments/verify-razorpay`, {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payments/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -291,18 +292,20 @@ const PublicRegistration = () => {
             setIsPaymentVerified(true);
             toast({
                 title: 'Payment Successful!',
-                description: 'Processing your registration...',
+                description: 'You will be redirected in 3 seconds',
                 className: 'bg-green-600 text-white'
             });
 
-            // Automatically submit the form after successful payment
-            // We pass the true flag to bypass potential stale state issues with isPaymentVerified
-            setTimeout(() => handleSubmit(undefined, true), 500);
+            // Automatically submit the form after 3 seconds as requested
+            setTimeout(() => {
+                handleSubmit(undefined, true);
+            }, 3000);
 
         } catch (error: any) {
+            console.error("Payment verification error:", error);
             toast({
                 title: 'Verification Failed',
-                description: error.message,
+                description: 'Payment verification failed. Please contact support.',
                 variant: 'destructive'
             });
         } finally {

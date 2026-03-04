@@ -14,7 +14,7 @@ const {
 const { protect } = require('../middleware/authMiddleware');
 
 router.post('/initiate', initiatePayment);
-router.post('/verify', verifyPayment);
+router.post('/verify', verifyRazorpayPayment);
 router.get('/history', protect, getPaymentHistory);
 router.get('/organizer-settings', protect, getOrganizerSettings);
 router.post('/organizer-settings', protect, saveOrganizerSettings);
