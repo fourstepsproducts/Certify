@@ -252,30 +252,8 @@ const PublicRegistration = () => {
                 name: "CertifyPro",
                 description: `Payment for ${link?.moduleId.name}`,
                 order_id: orderData.orderId,
-                handler: async function (response: any) {
-                    console.log("✅ Razorpay success handler triggered", response);
-                    try {
-                        const verified = await verifyRazorpayPayment(response, name, email);
-                        console.log("🔍 Verification result:", verified);
-
-                        if (verified) {
-                            const registered = await handleSubmit(undefined, true);
-                            console.log("📝 Registration result:", registered);
-
-                            console.log("➡️ Redirecting to success page");
-                            window.location.href = `/success?moduleName=${encodeURIComponent(moduleName)}`;
-                        } else {
-                            toast({
-                                title: 'Verification Failed',
-                                description: 'Payment verification failed. Please contact support.',
-                                variant: 'destructive'
-                            });
-                        }
-                    } catch (error) {
-                        console.error("❌ Error inside Razorpay handler:", error);
-                    }
-                },
-                callback_url: `${import.meta.env.VITE_API_BASE_URL}/api/payments/verify`,
+                redirect: true,
+                callback_url: `${import.meta.env.VITE_API_BASE_URL}/api/payments/verify?moduleId=${link?.moduleId._id}&email=${email}&name=${encodeURIComponent(name)}`,
                 prefill: {
                     name,
                     email,
@@ -301,18 +279,11 @@ const PublicRegistration = () => {
                 return;
             }
 
-            console.log("🚀 Starting Razorpay payment...");
+            // Submit registration before redirecting to ensure data is saved
+            await handleSubmit(undefined, true);
+
+            console.log("🚀 Starting Razorpay payment in redirect mode...");
             const rzp = new (window as any).Razorpay(options);
-
-            rzp.on('payment.failed', function (response: any) {
-                console.error("❌ Payment failed:", response.error);
-                toast({
-                    title: 'Payment Failed',
-                    description: response.error.description || 'Reason unknown',
-                    variant: 'destructive'
-                });
-            });
-
             rzp.open();
 
         } catch (error: any) {

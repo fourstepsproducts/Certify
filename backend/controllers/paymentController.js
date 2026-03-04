@@ -308,14 +308,18 @@ const createRazorpayOrder = asyncHandler(async (req, res) => {
 // @route   POST /api/payments/verify-razorpay
 // @access  Public
 const verifyRazorpayPayment = asyncHandler(async (req, res) => {
-    const {
-        razorpay_order_id,
-        razorpay_payment_id,
-        razorpay_signature,
-        moduleId,
-        email,
-        name
-    } = req.body;
+    // Collect data from either body (POST) or query (GET/Redirect)
+    const razorpay_order_id = req.body.razorpay_order_id || req.query.razorpay_order_id;
+    const razorpay_payment_id = req.body.razorpay_payment_id || req.query.razorpay_payment_id;
+    const razorpay_signature = req.body.razorpay_signature || req.query.razorpay_signature;
+    const moduleId = req.body.moduleId || req.query.moduleId;
+    const email = req.body.email || req.query.email;
+    const name = req.body.name || req.query.name;
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !moduleId) {
+        res.status(400);
+        throw new Error('Missing required Razorpay parameters for verification');
+    }
 
     const moduleRecord = await Module.findById(moduleId).select('+paymentConfig.razorpaySecret');
     if (!moduleRecord) {
@@ -360,71 +364,41 @@ const verifyRazorpayPayment = asyncHandler(async (req, res) => {
             { upsert: true, new: true }
         );
 
-        // Send confirmation email
-        try {
-            const dashboardUrl = `${process.env.FRONTEND_URL}/user/dashboard`;
-            await transporter.sendMail({
-                from: `"CertifyPro" <${process.env.EMAIL_USER}>`,
-                to: email,
-                subject: `Payment Receipt - ${moduleRecord.name}`,
-                html: `
-                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; background-color: #f9fafb; color: #1f2937;">
-                        <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-                            <div style="background: linear-gradient(to right, #4f46e5, #818cf8); padding: 30px; text-align: center;">
-                                <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Payment Received</h1>
-                                <p style="color: #e0e7ff; margin-top: 5px;">Thank you for your registration</p>
-                            </div>
-                            
-                            <div style="padding: 40px;">
-                                <p style="font-size: 16px;">Hello <strong>${name || 'User'}</strong>,</p>
-                                <p>This email serves as a formal receipt for your payment towards <strong>${moduleRecord.name}</strong>.</p>
-                                
-                                <div style="background-color: #f3f4f6; border-radius: 12px; padding: 25px; margin: 30px 0;">
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                        <span style="color: #6b7280;">Module:</span>
-                                        <span style="font-weight: bold;">${moduleRecord.name}</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                        <span style="color: #6b7280;">Order ID:</span>
-                                        <span style="font-family: monospace;">${razorpay_order_id}</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                        <span style="color: #6b7280;">Payment ID:</span>
-                                        <span style="font-family: monospace;">${razorpay_payment_id}</span>
-                                    </div>
-                                    <div style="border-top: 1px solid #e5e7eb; margin: 15px 0; padding-top: 15px; display: flex; justify-content: space-between;">
-                                        <span style="font-size: 18px; font-weight: bold;">Amount Paid:</span>
-                                        <span style="font-size: 18px; font-weight: bold; color: #4f46e5;">₹${moduleRecord.entryFee}</span>
-                                    </div>
-                                </div>
-                                
-                                <p style="text-align: center; margin-top: 40px;">
-                                    <a href="${dashboardUrl}" style="background-color: #4f46e5; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 10px; font-weight: bold; display: inline-block; transition: background-color 0.3s;">
-                                        View Bill on Dashboard
-                                    </a>
-                                </p>
-                                
-                                <p style="font-size: 14px; color: #6b7280; text-align: center; margin-top: 25px;">
-                                    You can download a PDF version of your bill from your student dashboard.
-                                </p>
-                            </div>
-                            
-                            <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #f3f4f6;">
-                                <p style="font-size: 12px; color: #9ca3af; margin: 0;">&copy; 2024 CertifyPro. All rights reserved.</p>
-                            </div>
-                        </div>
-                    </div>
-                `
-            });
-        } catch (emailError) {
-            console.error('Email confirmation failed:', emailError.message);
+        // Send confirmation email (with error trap)
+        if (email) {
+            try {
+                const dashboardUrl = `${process.env.FRONTEND_URL}/user/dashboard`;
+                await transporter.sendMail({
+                    from: `"CertifyPro" <${process.env.EMAIL_USER}>`,
+                    to: email,
+                    subject: `Payment Receipt - ${moduleRecord.name}`,
+                    html: `<div style="padding: 20px; font-family: sans-serif;">
+                        <h2>Payment Received</h2>
+                        <p>Thank you <strong>${name || 'User'}</strong> for your payment of ₹${moduleRecord.entryFee} for <strong>${moduleRecord.name}</strong>.</p>
+                        <p>Your Order ID: ${razorpay_order_id}</p>
+                        <p>Your Payment ID: ${razorpay_payment_id}</p>
+                        <p><a href="${dashboardUrl}" style="background: #4F46E5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">View on Dashboard</a></p>
+                    </div>`
+                });
+            } catch (emailError) {
+                console.error('Email confirmation failed:', emailError.message);
+            }
         }
 
-        res.status(200).json({
-            success: true,
-            message: 'Payment verified and confirmed',
-            status: 'paid'
-        });
+        // Handle Redirect for full-page Razorpay mode or JSON for modal
+        if (req.accepts('html') || req.query.moduleId) {
+            // This is a browser redirect (or explicitly requested via query)
+            const successUrl = `${process.env.FRONTEND_URL}/success?moduleName=${encodeURIComponent(moduleRecord.name)}`;
+            console.log(`[Verify] Redirecting user to success page: ${successUrl}`);
+            return res.redirect(successUrl);
+        } else {
+            // This is an AJAX call from a local handler
+            return res.status(200).json({
+                success: true,
+                message: 'Payment verified and confirmed',
+                status: 'paid'
+            });
+        }
     } else {
         res.status(400);
         throw new Error('Invalid signature. Payment verification failed.');
