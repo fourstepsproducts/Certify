@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
 const PaymentVerification = require('../models/PaymentVerification');
+const Registration = require('../models/Registration');
+const RegistrationLink = require('../models/RegistrationLink');
 const Module = require('../models/Module');
 const OrganizerPaymentSettings = require('../models/OrganizerPaymentSettings');
 const transporter = require('../utils/mailer');
@@ -315,6 +317,8 @@ const verifyRazorpayPayment = asyncHandler(async (req, res) => {
     const moduleId = req.body.moduleId || req.query.moduleId;
     const email = req.body.email || req.query.email;
     const name = req.body.name || req.query.name;
+    const linkId = req.body.linkId || req.query.linkId;
+    const phone = req.body.phone || req.query.phone;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !moduleId) {
         res.status(400);
@@ -352,7 +356,7 @@ const verifyRazorpayPayment = asyncHandler(async (req, res) => {
 
     if (expectedSignature === razorpay_signature) {
         // Payment verified
-        // Store verification info
+        // 1. Store verification info (enables handleSubmit on frontend)
         await PaymentVerification.findOneAndUpdate(
             { email: email.toLowerCase(), webinarId: moduleId },
             {
@@ -363,6 +367,28 @@ const verifyRazorpayPayment = asyncHandler(async (req, res) => {
             },
             { upsert: true, new: true }
         );
+
+        // 2. Perform fallback registration (if frontend handler failed)
+        if (linkId && email) {
+            try {
+                const existingRegistration = await Registration.findOne({ linkId, email: email.toLowerCase() });
+                if (!existingRegistration) {
+                    await Registration.create({
+                        moduleId,
+                        linkId,
+                        name: name || 'User',
+                        email: email.toLowerCase(),
+                        phoneNumber: phone || '',
+                        customData: {
+                            registrationStatus: 'auto_registered_from_payment'
+                        }
+                    });
+                    console.log(`[Verify] Auto-registered user: ${email}`);
+                }
+            } catch (regError) {
+                console.error('[Verify] Fallback registration failed:', regError.message);
+            }
+        }
 
         // Send confirmation email (with error trap)
         if (email) {

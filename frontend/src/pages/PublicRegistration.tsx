@@ -277,6 +277,7 @@ const PublicRegistration = () => {
                         });
                     }
                 },
+                callback_url: `${import.meta.env.VITE_API_BASE_URL}/api/payments/verify?moduleId=${link?.moduleId._id}&linkId=${linkId}&email=${email}&name=${encodeURIComponent(name)}&phone=${phone}`,
                 prefill: {
                     name,
                     email,
