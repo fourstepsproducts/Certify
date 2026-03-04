@@ -253,11 +253,9 @@ const PublicRegistration = () => {
 
                     if (verified) {
                         // First submit the registration to the database
-                        const registered = await handleSubmit(undefined, true);
-                        if (registered) {
-                            // Then redirect to the success page
-                            navigate(`/success?moduleName=${encodeURIComponent(moduleName)}`);
-                        }
+                        await handleSubmit(undefined, true);
+                        // Then redirect to the success page regardless of internal validation returns
+                        navigate(`/success?moduleName=${encodeURIComponent(moduleName)}`);
                     } else {
                         toast({
                             title: 'Verification Failed',
@@ -287,6 +285,15 @@ const PublicRegistration = () => {
                     }
                 }
             };
+
+            if (!(window as any).Razorpay) {
+                toast({
+                    title: "Payment Error",
+                    description: "Razorpay failed to load. Please refresh.",
+                    variant: "destructive"
+                });
+                return;
+            }
 
             const rzp = new (window as any).Razorpay(options);
 
