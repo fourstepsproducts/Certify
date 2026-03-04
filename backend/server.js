@@ -63,7 +63,8 @@ app.use(cors({
         return callback(null, true);
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'sentry-trace', 'baggage'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'sentry-trace', 'baggage', 'x-rtb-fingerprint-id'],
+    exposedHeaders: ['x-rtb-fingerprint-id'],
     credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
